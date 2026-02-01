@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HSE Incident Form - Safety Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .dashboard-bg {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+      height: 100vh;
+      height: 100dvh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dashboard-bg::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(147, 51, 234, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.08) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .modal-overlay {
+      height: 100vh;
+      height: 100dvh;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .modal-container {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      border-radius: 28px;
+      box-shadow: 
+        0 25px 80px -12px rgba(0, 0, 0, 0.4),
+        0 10px 40px -10px rgba(0, 0, 0, 0.2),
+        0 0 60px 15px rgba(59, 130, 246, 0.12),
+        0 0 30px 8px rgba(6, 182, 212, 0.08);
+      max-width: 1400px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: visible;
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #06b6d4 100%);
+      padding: 16px 28px;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+      border-radius: 28px 28px 0 0;
+    }
+
+    .modal-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+      animation: shimmer 15s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes shimmer {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-logo {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .header-divider {
+      width: 1px;
+      height: 36px;
+      background: rgba(255, 255, 255, 0.3);
+      margin: 0 4px;
+    }
+
+    .header-icon {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 10px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .header-icon svg {
+      width: 20px;
+      height: 20px;
+      color: #ffffff;
+    }
+
+    .header-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .modal-title {
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .modal-subtitle {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .close-btn {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 10px;
+      color: #ffffff;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.2s ease, background 0.2s ease;
+      cursor: pointer;
+    }
+
+    .close-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .form-body {
+      padding: 20px 28px;
+      flex: 1;
+      overflow-y: visible;
+      overflow-x: visible;
+    }
+
+    .form-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #3b82f6;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e0e7ff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .form-section-title svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .form-label {
+      display: block;
+      color: #475569;
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      letter-spacing: 0.02em;
+    }
+
+    .form-label .required {
+      color: #ef4444;
+      margin-left: 2px;
+    }
+
+    .form-input, .form-textarea {
+      width: 100%;
+      background-color: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      color: #1e293b;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .form-input:focus, .form-textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-input:hover, .form-textarea:hover {
+      border-color: #94a3b8;
+    }
+
+    .form-input::placeholder, .form-textarea::placeholder {
+      color: #94a3b8;
+      font-size: 12px;
+    }
+
+    .form-textarea {
+      resize: none;
+      min-height: 70px;
+      line-height: 1.4;
+    }
+
+    /* Date & Time Picker Styles */
+    .date-picker-wrapper, .time-picker-wrapper {
+      position: relative;
+    }
+
+    .date-display {
+      width: 100%;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      padding-right: 36px;
+      font-size: 13px;
+      color: #1e293b;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .date-display:hover { border-color: #94a3b8; }
+
+    .date-display.active {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .date-display-icon {
+      width: 16px;
+      height: 16px;
+      color: #3b82f6;
+      flex-shrink: 0;
+    }
+
+    .date-display-text {
+      flex: 1;
+      color: #1e293b;
+      font-size: 13px;
+    }
+
+    .date-display-text.placeholder {
+      color: #94a3b8;
+      font-size: 12px;
+    }
+
+    .date-display-arrow {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: #64748b;
+      transition: transform 0.2s ease;
+    }
+
+    .date-display.active .date-display-arrow {
+      transform: translateY(-50%) rotate(180deg);
+    }
+
+    .calendar-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      width: 240px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 
+        0 12px 30px -8px rgba(0, 0, 0, 0.2),
+        0 4px 12px -4px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(0, 0, 0, 0.05);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+      overflow: hidden;
+    }
+
+    .calendar-dropdown.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .calendar-header {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .calendar-nav-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      border-radius: 4px;
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #ffffff;
+      transition: background 0.15s ease;
+    }
+
+    .calendar-nav-btn:hover { background: rgba(255, 255, 255, 0.25); }
+    .calendar-nav-btn svg { width: 14px; height: 14px; }
+
+    .calendar-month-year {
+      font-size: 12px;
+      font-weight: 600;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .calendar-month-year select {
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      border-radius: 3px;
+      padding: 2px 4px;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .calendar-month-year select option {
+      background: #1e40af;
+      color: #ffffff;
+    }
+
+    .calendar-body { padding: 8px; }
+
+    .calendar-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px;
+      margin-bottom: 4px;
+    }
+
+    .calendar-weekday {
+      text-align: center;
+      font-size: 9px;
+      font-weight: 600;
+      color: #94a3b8;
+      padding: 4px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .calendar-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px;
+    }
+
+    .calendar-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 500;
+      color: #334155;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+      border: none;
+      background: transparent;
+    }
+
+    .calendar-day:hover:not(.disabled):not(.selected) {
+      background: #eff6ff;
+      color: #3b82f6;
+    }
+
+    .calendar-day.other-month { color: #cbd5e1; }
+
+    .calendar-day.today {
+      background: #f0f9ff;
+      color: #3b82f6;
+      font-weight: 600;
+      border: 1.5px solid #bfdbfe;
+    }
+
+    .calendar-day.selected {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(59, 130, 246, 0.25);
+    }
+
+    .calendar-day.disabled {
+      color: #e2e8f0;
+      cursor: not-allowed;
+    }
+
+    .calendar-footer {
+      padding: 6px 8px;
+      border-top: 1px solid #f1f5f9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .calendar-today-btn {
+      background: none;
+      border: none;
+      color: #3b82f6;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background 0.15s ease;
+    }
+
+    .calendar-today-btn:hover { background: #eff6ff; }
+
+    .calendar-clear-btn {
+      background: none;
+      border: none;
+      color: #64748b;
+      font-size: 10px;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .calendar-clear-btn:hover {
+      background: #f8fafc;
+      color: #ef4444;
+    }
+
+    /* Time Picker */
+    .time-dropdown { width: 200px; }
+
+    .time-btn {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #64748b;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .time-btn:hover {
+      background: #eff6ff;
+      border-color: #3b82f6;
+      color: #3b82f6;
+    }
+
+    /* Custom Select Dropdown Styles */
+    .custom-select-wrapper { position: relative; }
+
+    .custom-select-display {
+      width: 100%;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      padding-right: 36px;
+      font-size: 13px;
+      color: #1e293b;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .custom-select-display:hover { border-color: #94a3b8; }
+
+    .custom-select-display.active {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .custom-select-icon {
+      width: 16px;
+      height: 16px;
+      color: #3b82f6;
+      flex-shrink: 0;
+    }
+
+    .custom-select-text {
+      flex: 1;
+      color: #1e293b;
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .custom-select-text.placeholder {
+      color: #94a3b8;
+      font-size: 12px;
+    }
+
+    .custom-select-arrow {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: #64748b;
+      transition: transform 0.2s ease;
+    }
+
+    .custom-select-display.active .custom-select-arrow {
+      transform: translateY(-50%) rotate(180deg);
+    }
+
+    .custom-select-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      width: 100%;
+      min-width: 200px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 
+        0 12px 30px -8px rgba(0, 0, 0, 0.2),
+        0 4px 12px -4px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(0, 0, 0, 0.05);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+      overflow: hidden;
+      max-height: 280px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .custom-select-dropdown.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .custom-select-header {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .custom-select-header-icon {
+      width: 16px;
+      height: 16px;
+      color: #ffffff;
+    }
+
+    .custom-select-header-text {
+      font-size: 12px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .custom-select-options {
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .custom-select-option {
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #334155;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+    }
+
+    .custom-select-option:hover {
+      background: #eff6ff;
+      color: #3b82f6;
+    }
+
+    .custom-select-option.selected {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      color: #ffffff;
+    }
+
+    .custom-select-option-check {
+      width: 16px;
+      height: 16px;
+      opacity: 0;
+      flex-shrink: 0;
+    }
+
+    .custom-select-option.selected .custom-select-option-check { opacity: 1; }
+
+    /* Dropdown opens upward */
+    .custom-select-dropdown.dropup {
+      top: auto;
+      bottom: calc(100% + 4px);
+      transform: translateY(8px);
+    }
+
+    .custom-select-dropdown.dropup.show { transform: translateY(0); }
+
+    .custom-select-wrapper.dropup .custom-select-arrow {
+      transform: translateY(-50%) rotate(180deg);
+    }
+
+    .custom-select-wrapper.dropup .custom-select-display.active .custom-select-arrow {
+      transform: translateY(-50%) rotate(0deg);
+    }
+
+    .file-upload-area {
+      width: 100%;
+      background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+      border: 1.5px dashed #cbd5e1;
+      border-radius: 8px;
+      padding: 16px 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .file-upload-area:hover {
+      border-color: #3b82f6;
+      background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+    }
+
+    .file-upload-area:hover .upload-icon { color: #3b82f6; }
+
+    .upload-icon {
+      width: 28px;
+      height: 28px;
+      margin: 0 auto 8px;
+      color: #64748b;
+      transition: color 0.2s ease;
+    }
+
+    .upload-text {
+      color: #475569;
+      font-weight: 600;
+      font-size: 12px;
+      margin-bottom: 2px;
+    }
+
+    .form-field { margin-bottom: 12px; }
+    .form-field:last-child { margin-bottom: 0; }
+
+    .form-row {
+      display: grid;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .form-row .form-field { margin-bottom: 0; }
+
+    .form-actions {
+      padding: 14px 28px 16px;
+      background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-shrink: 0;
+      border-radius: 0 0 28px 28px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn svg { width: 14px; height: 14px; }
+
+    .btn-secondary {
+      background: #ffffff;
+      color: #475569;
+      border: 1.5px solid #e2e8f0;
+    }
+
+    .btn-secondary:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .save-btn {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      color: #ffffff;
+      box-shadow: 
+        0 2px 8px rgba(59, 130, 246, 0.3),
+        0 1px 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .save-btn:hover {
+      box-shadow: 
+        0 4px 12px rgba(59, 130, 246, 0.4),
+        0 2px 6px rgba(59, 130, 246, 0.3);
+    }
+
+    .save-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    /* ============================================
+       RESPONSIVE BREAKPOINTS
+       ============================================ */
+
+    @media (min-width: 1400px) {
+      .form-body > .form-row:first-of-type { grid-template-columns: repeat(5, 1fr) !important; }
+      .form-body > .form-row:not(:first-of-type) { grid-template-columns: repeat(4, 1fr) !important; }
+    }
+
+    @media (min-width: 1024px) and (max-width: 1399px) {
+      .modal-container { max-width: 98%; }
+      .form-body > .form-row:first-of-type { grid-template-columns: repeat(5, 1fr) !important; gap: 10px !important; }
+      .form-body > .form-row:not(:first-of-type) { grid-template-columns: repeat(4, 1fr) !important; gap: 12px !important; }
+      .form-body { padding: 16px 20px; }
+      .form-textarea { min-height: 80px !important; }
+    }
+
+    @media (min-width: 768px) and (max-width: 1023px) {
+      .modal-overlay { padding: 12px; }
+      .modal-container { max-height: calc(100dvh - 24px); border-radius: 16px; }
+      .modal-header { padding: 14px 20px; }
+      .form-body { padding: 16px 20px; }
+      .form-body > .form-row:first-of-type { grid-template-columns: repeat(3, 1fr) !important; gap: 12px !important; }
+      .form-body > .form-row:not(:first-of-type) { grid-template-columns: repeat(2, 1fr) !important; gap: 14px !important; }
+      .form-section-title { margin-bottom: 10px; margin-top: 14px !important; }
+      .form-textarea { min-height: 85px !important; }
+      .form-actions { padding: 12px 20px; }
+    }
+
+    @media (min-width: 576px) and (max-width: 767px) {
+      .modal-overlay { padding: 8px; }
+      .modal-container { max-height: calc(100dvh - 16px); border-radius: 14px; }
+      .modal-header { padding: 12px 16px; }
+      .header-logo { height: 36px; }
+      .header-divider { height: 28px; margin: 0 2px; }
+      .header-icon { width: 36px; height: 36px; }
+      .header-icon svg { width: 18px; height: 18px; }
+      .modal-title { font-size: 17px; }
+      .modal-subtitle { font-size: 11px; }
+      .form-body { padding: 14px 16px; }
+      .form-body > .form-row { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
+      .form-section-title { font-size: 10px; margin-bottom: 10px; margin-top: 12px !important; }
+      .form-label { font-size: 10px; margin-bottom: 3px; }
+      .form-input, .form-textarea { padding: 9px 10px; font-size: 12px; }
+      .form-textarea { min-height: 70px !important; }
+      .form-actions { padding: 10px 16px 12px; gap: 8px; }
+      .btn { padding: 9px 16px; font-size: 12px; }
+    }
+
+    @media (max-width: 575px) {
+      html, body { overflow: auto; }
+      .dashboard-bg { min-height: 100dvh; height: auto; overflow: auto; }
+      .modal-overlay { min-height: 100dvh; height: auto; padding: 8px; align-items: flex-start; padding-top: 12px; padding-bottom: 12px; }
+      .modal-container { max-height: none; border-radius: 16px; margin: 0 auto; }
+      .modal-header { padding: 14px 16px; position: sticky; top: 0; z-index: 10; }
+      .header-left { gap: 8px; }
+      .header-logo { height: 32px; }
+      .header-divider { height: 24px; margin: 0; }
+      .header-icon { width: 32px; height: 32px; border-radius: 8px; }
+      .header-icon svg { width: 16px; height: 16px; }
+      .modal-title { font-size: 14px; }
+      .modal-subtitle { font-size: 9px; }
+      .close-btn { width: 32px; height: 32px; border-radius: 8px; }
+      .close-btn svg { width: 16px; height: 16px; }
+      .form-body { padding: 16px; overflow: visible; }
+      .form-body > .form-row { grid-template-columns: 1fr !important; gap: 12px !important; }
+      .form-section-title { font-size: 11px; margin-bottom: 12px; padding-bottom: 8px; }
+      .form-section-title:not(:first-child) { margin-top: 16px !important; }
+      .form-label { font-size: 11px; margin-bottom: 4px; }
+      .form-field { margin-bottom: 0; }
+      .form-input, .form-textarea { padding: 12px 14px; font-size: 14px; border-radius: 10px; }
+      .form-textarea { min-height: 90px !important; }
+      .date-display, .custom-select-display { padding: 12px 14px; border-radius: 10px; font-size: 14px; }
+      .custom-select-text { font-size: 14px; }
+      .custom-select-text.placeholder { font-size: 13px; }
+      .custom-select-dropdown { border-radius: 12px; }
+      .custom-select-dropdown.dropup { top: calc(100% + 4px); bottom: auto; transform: translateY(-8px); }
+      .custom-select-dropdown.dropup.show { transform: translateY(0); }
+      .custom-select-wrapper.dropup .custom-select-arrow { transform: translateY(-50%) rotate(0deg); }
+      .custom-select-wrapper.dropup .custom-select-display.active .custom-select-arrow { transform: translateY(-50%) rotate(180deg); }
+      .custom-select-option { padding: 12px 14px; font-size: 14px; }
+      .calendar-dropdown { width: 100%; max-width: 300px; left: 50%; transform: translateX(-50%) translateY(-10px); }
+      .calendar-dropdown.show { transform: translateX(-50%) translateY(0); }
+      .file-upload-area { padding: 16px !important; }
+      .file-upload-area > div { flex-direction: column !important; text-align: center !important; }
+      .file-upload-area > div > div { text-align: center !important; }
+      .upload-icon { width: 28px !important; height: 28px !important; margin: 0 auto 8px !important; }
+      .upload-text { font-size: 13px !important; }
+      .form-actions { padding: 16px; flex-direction: column-reverse; gap: 10px; position: sticky; bottom: 0; z-index: 10; }
+      .btn { width: 100%; justify-content: center; padding: 14px 20px; font-size: 14px; border-radius: 10px; }
+      .btn svg { width: 16px; height: 16px; }
+    }
+
+    @media (max-width: 360px) {
+      .modal-overlay { padding: 4px; }
+      .modal-header { padding: 10px; }
+      .header-left { gap: 6px; }
+      .header-logo { height: 28px; }
+      .header-divider, .header-icon { display: none; }
+      .modal-title { font-size: 13px; }
+      .modal-subtitle { font-size: 9px; }
+      .form-body { padding: 12px; }
+      .form-actions { padding: 12px; }
+      .btn { padding: 12px 16px; font-size: 13px; }
+    }
+  </style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="dashboard-bg">
+   <div class="modal-overlay">
+    <div class="modal-container">
+     <div class="modal-header">
+      <div class="header-content">
+       <div class="header-left">
+        <img src="sisco-logo.png" alt="SISCO Logo" class="header-logo">
+        <div class="header-divider"></div>
+        <div class="header-icon">
+         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+         </svg>
+        </div>
+        <div class="header-text">
+         <h1 class="modal-title" id="modalTitle">HSE Incident Form</h1>
+         <span class="modal-subtitle">Report and document safety incidents</span>
+        </div>
+       </div>
+       <button class="close-btn" aria-label="Close modal">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+         <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+       </button>
+      </div>
+     </div>
+
+     <form id="incidentForm">
+      <div class="form-body">
+       <div class="form-section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+         <circle cx="12" cy="12" r="10"></circle>
+         <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        Incident Information
+       </div>
+
+       <div class="form-row" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 16px;">
+        <div class="form-field">
+         <label class="form-label" for="observationDate">Date Observed</label>
+         <div class="date-picker-wrapper">
+          <input type="hidden" id="observationDate">
+          <div class="date-display" id="dateDisplay">
+           <svg class="date-display-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+           </svg>
+           <span class="date-display-text placeholder" id="dateDisplayText">Select a date...</span>
+           <svg class="date-display-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+           </svg>
+          </div>
+          <div class="calendar-dropdown" id="calendarDropdown">
+           <div class="calendar-header">
+            <button type="button" class="calendar-nav-btn" id="prevMonth">
+             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <div class="calendar-month-year">
+             <select id="monthSelect"></select>
+             <select id="yearSelect"></select>
+            </div>
+            <button type="button" class="calendar-nav-btn" id="nextMonth">
+             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+           </div>
+           <div class="calendar-body">
+            <div class="calendar-weekdays">
+             <div class="calendar-weekday">Sun</div>
+             <div class="calendar-weekday">Mon</div>
+             <div class="calendar-weekday">Tue</div>
+             <div class="calendar-weekday">Wed</div>
+             <div class="calendar-weekday">Thu</div>
+             <div class="calendar-weekday">Fri</div>
+             <div class="calendar-weekday">Sat</div>
+            </div>
+            <div class="calendar-days" id="calendarDays"></div>
+           </div>
+           <div class="calendar-footer">
+            <button type="button" class="calendar-clear-btn" id="clearDate">Clear</button>
+            <button type="button" class="calendar-today-btn" id="todayBtn">Today</button>
+           </div>
+          </div>
+         </div>
+        </div>
+
+        <div class="form-field">
+         <label class="form-label" for="observationTime">Time Observed</label>
+         <div class="time-picker-wrapper">
+          <input type="hidden" id="observationTime">
+          <div class="date-display" id="timeDisplay">
+           <svg class="date-display-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+           </svg>
+           <span class="date-display-text placeholder" id="timeDisplayText">Select time...</span>
+           <svg class="date-display-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+           </svg>
+          </div>
+          <div class="calendar-dropdown time-dropdown" id="timeDropdown">
+           <div class="calendar-header" style="justify-content: flex-start;">
+            <svg style="width: 16px; height: 16px; color: #ffffff;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+             <circle cx="12" cy="12" r="10"></circle>
+             <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span style="font-size: 12px; font-weight: 600; color: #ffffff; margin-left: 8px;">Select Time</span>
+           </div>
+           <div style="padding: 12px;">
+            <div style="display: flex; gap: 8px; align-items: center; justify-content: center;">
+             <div style="display: flex; flex-direction: column; align-items: center;">
+              <button type="button" class="time-btn" id="hourUp">
+               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"></polyline></svg>
+              </button>
+              <input type="text" id="hourInput" value="12" maxlength="2" style="width: 40px; text-align: center; font-size: 18px; font-weight: 600; border: 1.5px solid #e2e8f0; border-radius: 6px; padding: 6px;">
+              <button type="button" class="time-btn" id="hourDown">
+               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+             </div>
+             <span style="font-size: 20px; font-weight: 600; color: #334155;">:</span>
+             <div style="display: flex; flex-direction: column; align-items: center;">
+              <button type="button" class="time-btn" id="minUp">
+               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"></polyline></svg>
+              </button>
+              <input type="text" id="minInput" value="00" maxlength="2" style="width: 40px; text-align: center; font-size: 18px; font-weight: 600; border: 1.5px solid #e2e8f0; border-radius: 6px; padding: 6px;">
+              <button type="button" class="time-btn" id="minDown">
+               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+             </div>
+             <div style="display: flex; flex-direction: column; gap: 4px; margin-left: 8px;">
+              <button type="button" id="amBtn" style="padding: 6px 10px; font-size: 11px; font-weight: 600; border: 1.5px solid #e2e8f0; border-radius: 4px; background: #ffffff; cursor: pointer;">AM</button>
+              <button type="button" id="pmBtn" style="padding: 6px 10px; font-size: 11px; font-weight: 600; border: 1.5px solid #3b82f6; border-radius: 4px; background: #3b82f6; color: #ffffff; cursor: pointer;">PM</button>
+             </div>
+            </div>
+           </div>
+           <div class="calendar-footer">
+            <button type="button" class="calendar-clear-btn" id="clearTime">Clear</button>
+            <button type="button" class="calendar-today-btn" id="setTimeBtn">Set Time</button>
+           </div>
+          </div>
+         </div>
+        </div>
+
+        <div class="form-field">
+         <label class="form-label" for="project">Projects</label>
+         <div class="custom-select-wrapper" data-select-id="project">
+          <input type="hidden" id="project">
+          <div class="custom-select-display" id="projectDisplay">
+           <svg class="custom-select-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+           </svg>
+           <span class="custom-select-text placeholder" id="projectText">Select project...</span>
+           <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+           </svg>
+          </div>
+          <div class="custom-select-dropdown" id="projectDropdown">
+           <div class="custom-select-header">
+            <svg class="custom-select-header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+             <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            <span class="custom-select-header-text">Select Project</span>
+           </div>
+           <div class="custom-select-options" id="projectOptions"></div>
+          </div>
+         </div>
+        </div>
+
+        <div class="form-field">
+         <label class="form-label" for="workLocation">Work Location</label>
+         <input type="text" id="workLocation" class="form-input" placeholder="Enter work location...">
+        </div>
+
+        <div class="form-field">
+         <label class="form-label" for="task">Task</label>
+         <input type="text" id="task" class="form-input" placeholder="Enter task...">
+        </div>
+       </div>
+
+       <div class="form-section-title" style="margin-top: 16px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+         <polyline points="14 2 14 8 20 8"></polyline>
+         <line x1="16" y1="13" x2="8" y2="13"></line>
+         <line x1="16" y1="17" x2="8" y2="17"></line>
+         <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        Details &amp; Classification
+       </div>
+
+       <div class="form-row" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 16px;">
+        <div class="form-field">
+         <label class="form-label" for="incidentDetails">Incident Details</label>
+         <textarea id="incidentDetails" class="form-textarea" style="min-height: 90px;" placeholder="Describe the incident..."></textarea>
+        </div>
+
+        <div class="form-field">
+         <label class="form-label" for="locationDetails">Location Details</label>
+         <textarea id="locationDetails" class="form-textarea" style="min-height: 90px;" placeholder="Specify exact location..."></textarea>
+        </div>
+
+        <div class="form-field">
+         <label class="form-label" for="actionTaken">Action Taken</label>
+         <textarea id="actionTaken" class="form-textarea" style="min-height: 90px;" placeholder="Actions taken..."></textarea>
+        </div>
+
+        <div class="form-field">
+         <label class="form-label" for="recommendations">Recommendations</label>
+         <textarea id="recommendations" class="form-textarea" style="min-height: 90px;" placeholder="Recommendations..."></textarea>
+        </div>
+       </div>
+
+       <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+        <div class="form-field">
+         <label class="form-label" for="category">Category</label>
+         <div class="custom-select-wrapper dropup" data-select-id="category">
+          <input type="hidden" id="category">
+          <div class="custom-select-display" id="categoryDisplay">
+           <svg class="custom-select-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+           </svg>
+           <span class="custom-select-text placeholder" id="categoryText">Select category...</span>
+           <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+           </svg>
+          </div>
+          <div class="custom-select-dropdown dropup" id="categoryDropdown">
+           <div class="custom-select-header">
+            <svg class="custom-select-header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+             <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span class="custom-select-header-text">Category</span>
+           </div>
+           <div class="custom-select-options" id="categoryOptions"></div>
+          </div>
+         </div>
+        </div>
+
+        <div class="form-field">
+         <label class="form-label" for="potential">Potential Impact</label>
+         <div class="custom-select-wrapper dropup" data-select-id="potential">
+          <input type="hidden" id="potential">
+          <div class="custom-select-display" id="potentialDisplay">
+           <svg class="custom-select-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+           </svg>
+           <span class="custom-select-text placeholder" id="potentialText">Select potential impact...</span>
+           <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+           </svg>
+          </div>
+          <div class="custom-select-dropdown dropup" id="potentialDropdown">
+           <div class="custom-select-header">
+            <svg class="custom-select-header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+             <circle cx="12" cy="12" r="10"></circle>
+             <line x1="12" y1="8" x2="12" y2="12"></line>
+             <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span class="custom-select-header-text">Potential Impact</span>
+           </div>
+           <div class="custom-select-options" id="potentialOptions"></div>
+          </div>
+         </div>
+        </div>
+
+        <div class="form-field">
+         <label class="form-label" for="attachment">Attachment <span class="required">*</span></label>
+         <div style="display: flex; gap: 8px;">
+          <div class="file-upload-area" style="padding: 10px 12px; flex: 1;" onclick="document.getElementById('fileInput').click()">
+           <div style="display: flex; align-items: center; gap: 10px;">
+            <svg class="upload-icon" style="width: 20px; height: 20px; margin: 0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+             <polyline points="17 8 12 3 7 8"></polyline>
+             <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <div class="upload-text" style="margin: 0;">Upload</div>
+           </div>
+          </div>
+          <div class="file-upload-area" style="padding: 10px 12px; flex: 1;" onclick="document.getElementById('cameraInput').click()">
+           <div style="display: flex; align-items: center; gap: 10px;">
+            <svg class="upload-icon" style="width: 20px; height: 20px; margin: 0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+             <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+            <div class="upload-text" style="margin: 0;">Camera</div>
+           </div>
+          </div>
+         </div>
+         <div id="fileLabel" style="margin-top: 6px; font-size: 12px; color: #64748b; text-align: center;">No file selected</div>
+         <input type="file" id="fileInput" style="display: none;" accept=".png,.jpg,.jpeg">
+         <input type="file" id="cameraInput" style="display: none;" accept="image/*" capture="environment">
+        </div>
+       </div>
+      </div>
+
+      <div class="form-actions">
+       <button type="button" class="btn btn-secondary" id="clearFormBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+         <path d="M3 6h18"></path>
+         <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+        </svg>
+        Clear Form
+       </button>
+       <button type="submit" class="btn save-btn" id="saveButton">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+         <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+         <polyline points="17 21 17 13 7 13 7 21"></polyline>
+         <polyline points="7 3 7 8 15 8"></polyline>
+        </svg>
+        <span>Save Incident</span>
+       </button>
+      </div>
+     </form>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      modal_title: "HSE Incident Form",
+      modal_subtitle: "Report and document safety incidents",
+      save_button_text: "Submit Incident",
+      header_gradient_start: "#1e40af",
+      header_gradient_middle: "#3b82f6",
+      header_gradient_end: "#06b6d4",
+      button_gradient_start: "#1e40af",
+      button_gradient_end: "#3b82f6",
+      power_automate_url: "https://default8ee74b123fcf4318b334a018f82b0b.9e.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/bc7e75ce650c47dbbabd72d44688c928/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=2Z7ywGmGcfD9ZnVtdsMwJpcniaQ-MhajkQpRRx8Vu9s"
+    };
+
+    const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+
+    // Dropdown options data
+    const selectOptions = {
+      project: [
+        { value: 'crpo03', text: 'CRPO 03' },
+        { value: 'crpo07', text: 'CRPO 07' },
+        { value: 'crpo08', text: 'CRPO 08' },
+        { value: 'crpo09', text: 'CRPO 09' },
+        { value: 'crpo13', text: 'CRPO 13' },
+        { value: 'crpo18', text: 'CRPO 18' },
+        { value: 'crpo19', text: 'CRPO 19' },
+        { value: 'crpo23', text: 'CRPO 23' },
+        { value: 'crpo26', text: 'CRPO 26' },
+        { value: 'crpo27', text: 'CRPO 27' },
+        { value: 'crpo30', text: 'CRPO 30' },
+        { value: 'jubail_fabshop', text: 'JUBAIL FABSHOP' },
+        { value: 'jubail_hadi_yard', text: 'JUBAIL HADI YARD' },
+        { value: 'qiddiya', text: 'QIDDIYA' }
+      ],
+      category: [
+        { value: 'injury', text: 'Personal Injury' },
+        { value: 'property', text: 'Property Damage' },
+        { value: 'nearmiss', text: 'Near Miss' },
+        { value: 'hazard', text: 'Hazard Observation' },
+        { value: 'compliance', text: 'Compliance Issue' }
+      ],
+      potential: [
+        { value: 'catastrophic', text: 'Catastrophic' },
+        { value: 'major', text: 'Major' },
+        { value: 'moderate', text: 'Moderate' },
+        { value: 'minor', text: 'Minor' },
+        { value: 'negligible', text: 'Negligible' }
+      ]
+    };
+
+    // Generate options HTML
+    function generateOptionsHTML(options) {
+      return options.map(opt => `
+        <button type="button" class="custom-select-option" data-value="${opt.value}">
+          <svg class="custom-select-option-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          ${opt.text}
+        </button>
+      `).join('');
+    }
+
+    // Populate all dropdowns
+    document.getElementById('projectOptions').innerHTML = generateOptionsHTML(selectOptions.project);
+    document.getElementById('categoryOptions').innerHTML = generateOptionsHTML(selectOptions.category);
+    document.getElementById('potentialOptions').innerHTML = generateOptionsHTML(selectOptions.potential);
+
+    // Config change handler
+    function onConfigChange(cfg) {
+      const modalTitle = document.getElementById('modalTitle');
+      const modalSubtitle = document.querySelector('.modal-subtitle');
+      const saveButton = document.getElementById('saveButton');
+      const modalHeader = document.querySelector('.modal-header');
+      const saveBtn = document.querySelector('.save-btn');
+
+      if (modalTitle) modalTitle.textContent = cfg.modal_title || defaultConfig.modal_title;
+      if (modalSubtitle) modalSubtitle.textContent = cfg.modal_subtitle || defaultConfig.modal_subtitle;
+      if (saveButton) {
+        const spanEl = saveButton.querySelector('span');
+        if (spanEl) spanEl.textContent = cfg.save_button_text || defaultConfig.save_button_text;
+      }
+      if (modalHeader) {
+        modalHeader.style.background = `linear-gradient(135deg, ${cfg.header_gradient_start || defaultConfig.header_gradient_start} 0%, ${cfg.header_gradient_middle || defaultConfig.header_gradient_middle} 50%, ${cfg.header_gradient_end || defaultConfig.header_gradient_end} 100%)`;
+      }
+      if (saveBtn) {
+        saveBtn.style.background = `linear-gradient(135deg, ${cfg.button_gradient_start || defaultConfig.button_gradient_start} 0%, ${cfg.button_gradient_end || defaultConfig.button_gradient_end} 100%)`;
+      }
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (cfg) => ({
+          recolorables: [
+            { get: () => cfg.header_gradient_start || defaultConfig.header_gradient_start, set: (v) => { cfg.header_gradient_start = v; window.elementSdk.setConfig({ header_gradient_start: v }); } },
+            { get: () => cfg.header_gradient_middle || defaultConfig.header_gradient_middle, set: (v) => { cfg.header_gradient_middle = v; window.elementSdk.setConfig({ header_gradient_middle: v }); } },
+            { get: () => cfg.header_gradient_end || defaultConfig.header_gradient_end, set: (v) => { cfg.header_gradient_end = v; window.elementSdk.setConfig({ header_gradient_end: v }); } },
+            { get: () => cfg.button_gradient_start || defaultConfig.button_gradient_start, set: (v) => { cfg.button_gradient_start = v; window.elementSdk.setConfig({ button_gradient_start: v }); } },
+            { get: () => cfg.button_gradient_end || defaultConfig.button_gradient_end, set: (v) => { cfg.button_gradient_end = v; window.elementSdk.setConfig({ button_gradient_end: v }); } }
+          ],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (cfg) => new Map([
+          ["modal_title", cfg.modal_title || defaultConfig.modal_title],
+          ["modal_subtitle", cfg.modal_subtitle || defaultConfig.modal_subtitle],
+          ["save_button_text", cfg.save_button_text || defaultConfig.save_button_text]
+        ])
+      });
+    }
+
+    // Date Picker
+    const datePicker = {
+      currentDate: new Date(),
+      selectedDate: null,
+      isOpen: false,
+      init() {
+        this.dateDisplay = document.getElementById('dateDisplay');
+        this.dateDisplayText = document.getElementById('dateDisplayText');
+        this.calendarDropdown = document.getElementById('calendarDropdown');
+        this.calendarDays = document.getElementById('calendarDays');
+        this.monthSelect = document.getElementById('monthSelect');
+        this.yearSelect = document.getElementById('yearSelect');
+        this.hiddenInput = document.getElementById('observationDate');
+        this.populateSelects();
+        this.renderCalendar();
+        this.bindEvents();
+      },
+      populateSelects() {
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        this.monthSelect.innerHTML = months.map((m, i) => `<option value="${i}">${m}</option>`).join('');
+        this.monthSelect.value = this.currentDate.getMonth();
+        const currentYear = new Date().getFullYear();
+        let years = '';
+        for (let y = currentYear - 10; y <= currentYear + 5; y++) years += `<option value="${y}">${y}</option>`;
+        this.yearSelect.innerHTML = years;
+        this.yearSelect.value = this.currentDate.getFullYear();
+      },
+      renderCalendar() {
+        const year = this.currentDate.getFullYear(), month = this.currentDate.getMonth();
+        const firstDay = new Date(year, month, 1), lastDay = new Date(year, month + 1, 0);
+        const startDay = firstDay.getDay(), daysInMonth = lastDay.getDate();
+        const prevMonthLastDay = new Date(year, month, 0).getDate();
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        let html = '';
+        for (let i = startDay - 1; i >= 0; i--) {
+          const day = prevMonthLastDay - i;
+          html += `<button type="button" class="calendar-day other-month" data-date="${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}">${day}</button>`;
+        }
+        for (let day = 1; day <= daysInMonth; day++) {
+          const date = new Date(year, month, day); date.setHours(0, 0, 0, 0);
+          const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+          let classes = 'calendar-day';
+          if (date.getTime() === today.getTime()) classes += ' today';
+          if (this.selectedDate && date.getTime() === this.selectedDate.getTime()) classes += ' selected';
+          html += `<button type="button" class="${classes}" data-date="${dateStr}">${day}</button>`;
+        }
+        const totalCells = 42, remainingCells = totalCells - (startDay + daysInMonth);
+        for (let day = 1; day <= remainingCells; day++) {
+          html += `<button type="button" class="calendar-day other-month" data-date="${year}-${String(month + 2).padStart(2, '0')}-${String(day).padStart(2, '0')}">${day}</button>`;
+        }
+        this.calendarDays.innerHTML = html;
+        this.monthSelect.value = month;
+        this.yearSelect.value = year;
+      },
+      bindEvents() {
+        this.dateDisplay.addEventListener('click', (e) => { e.stopPropagation(); this.toggle(); });
+        this.calendarDropdown.addEventListener('click', (e) => e.stopPropagation());
+        document.addEventListener('click', (e) => { if (this.isOpen && !e.target.closest('.date-picker-wrapper')) this.close(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && this.isOpen) this.close(); });
+        document.getElementById('prevMonth').addEventListener('click', () => { this.currentDate.setMonth(this.currentDate.getMonth() - 1); this.renderCalendar(); });
+        document.getElementById('nextMonth').addEventListener('click', () => { this.currentDate.setMonth(this.currentDate.getMonth() + 1); this.renderCalendar(); });
+        this.monthSelect.addEventListener('change', () => { this.currentDate.setMonth(parseInt(this.monthSelect.value)); this.renderCalendar(); });
+        this.yearSelect.addEventListener('change', () => { this.currentDate.setFullYear(parseInt(this.yearSelect.value)); this.renderCalendar(); });
+        this.calendarDays.addEventListener('click', (e) => {
+          if (e.target.classList.contains('calendar-day') && !e.target.classList.contains('disabled')) {
+            this.selectDate(new Date(e.target.dataset.date + 'T00:00:00'));
+          }
+        });
+        document.getElementById('todayBtn').addEventListener('click', () => { const today = new Date(); today.setHours(0, 0, 0, 0); this.currentDate = new Date(today); this.selectDate(today); });
+        document.getElementById('clearDate').addEventListener('click', () => this.clearDate());
+      },
+      toggle() { this.isOpen ? this.close() : this.open(); },
+      open() { this.isOpen = true; this.dateDisplay.classList.add('active'); this.calendarDropdown.classList.add('show'); if (this.selectedDate) this.currentDate = new Date(this.selectedDate); this.renderCalendar(); },
+      close() { this.isOpen = false; this.dateDisplay.classList.remove('active'); this.calendarDropdown.classList.remove('show'); },
+      selectDate(date) {
+        this.selectedDate = date; this.currentDate = new Date(date);
+        this.dateDisplayText.textContent = date.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' });
+        this.dateDisplayText.classList.remove('placeholder');
+        this.hiddenInput.value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        this.renderCalendar(); this.close();
+      },
+      clearDate() { this.selectedDate = null; this.dateDisplayText.textContent = 'Select a date...'; this.dateDisplayText.classList.add('placeholder'); this.hiddenInput.value = ''; this.currentDate = new Date(); this.renderCalendar(); this.close(); }
+    };
+    datePicker.init();
+
+    // Custom Select Class
+    class CustomSelect {
+      constructor(wrapperId) {
+        this.wrapper = document.querySelector(`[data-select-id="${wrapperId}"]`);
+        if (!this.wrapper) return;
+        this.selectId = wrapperId;
+        this.hiddenInput = document.getElementById(wrapperId);
+        this.display = document.getElementById(`${wrapperId}Display`);
+        this.displayText = document.getElementById(`${wrapperId}Text`);
+        this.dropdown = document.getElementById(`${wrapperId}Dropdown`);
+        this.options = this.dropdown.querySelectorAll('.custom-select-option');
+        this.isOpen = false;
+        this.selectedValue = '';
+        this.selectedText = '';
+        this.placeholder = this.displayText.textContent;
+        this.bindEvents();
+      }
+      bindEvents() {
+        this.display.addEventListener('click', (e) => { e.stopPropagation(); this.toggle(); });
+        this.dropdown.addEventListener('click', (e) => e.stopPropagation());
+        this.options.forEach(option => {
+          option.addEventListener('click', () => this.selectOption(option.dataset.value, option.textContent.trim()));
+        });
+      }
+      toggle() { this.isOpen ? this.close() : this.open(); }
+      open() {
+        customSelects.forEach(s => { if (s !== this) s.close(); });
+        if (datePicker.isOpen) datePicker.close();
+        if (timePicker.isOpen) timePicker.close();
+        this.isOpen = true; this.display.classList.add('active'); this.dropdown.classList.add('show');
+      }
+      close() { this.isOpen = false; this.display.classList.remove('active'); this.dropdown.classList.remove('show'); }
+      selectOption(value, text) {
+        this.selectedValue = value; this.selectedText = text;
+        this.displayText.textContent = text; this.displayText.classList.remove('placeholder');
+        this.hiddenInput.value = value;
+        this.options.forEach(opt => opt.classList.toggle('selected', opt.dataset.value === value));
+        this.close();
+      }
+      clear() { this.selectedValue = ''; this.selectedText = ''; this.displayText.textContent = this.placeholder; this.displayText.classList.add('placeholder'); this.hiddenInput.value = ''; this.options.forEach(opt => opt.classList.remove('selected')); }
+      getValue() { return this.selectedValue; }
+      getText() { return this.selectedText; }
+    }
+
+    const customSelects = [new CustomSelect('project'), new CustomSelect('category'), new CustomSelect('potential')];
+
+    // Time Picker
+    const timePicker = {
+      isOpen: false, hour: 12, minute: 0, isPM: true,
+      init() {
+        this.timeDisplay = document.getElementById('timeDisplay');
+        this.timeDisplayText = document.getElementById('timeDisplayText');
+        this.timeDropdown = document.getElementById('timeDropdown');
+        this.hourInput = document.getElementById('hourInput');
+        this.minInput = document.getElementById('minInput');
+        this.amBtn = document.getElementById('amBtn');
+        this.pmBtn = document.getElementById('pmBtn');
+        this.hiddenInput = document.getElementById('observationTime');
+        this.bindEvents();
+      },
+      bindEvents() {
+        this.timeDisplay.addEventListener('click', (e) => { e.stopPropagation(); this.toggle(); });
+        this.timeDropdown.addEventListener('click', (e) => e.stopPropagation());
+        document.getElementById('hourUp').addEventListener('click', () => { this.hour = this.hour >= 12 ? 1 : this.hour + 1; this.hourInput.value = String(this.hour).padStart(2, '0'); });
+        document.getElementById('hourDown').addEventListener('click', () => { this.hour = this.hour <= 1 ? 12 : this.hour - 1; this.hourInput.value = String(this.hour).padStart(2, '0'); });
+        document.getElementById('minUp').addEventListener('click', () => { this.minute = this.minute >= 59 ? 0 : this.minute + 1; this.minInput.value = String(this.minute).padStart(2, '0'); });
+        document.getElementById('minDown').addEventListener('click', () => { this.minute = this.minute <= 0 ? 59 : this.minute - 1; this.minInput.value = String(this.minute).padStart(2, '0'); });
+        this.amBtn.addEventListener('click', () => { this.isPM = false; this.updateAmPmStyle(); });
+        this.pmBtn.addEventListener('click', () => { this.isPM = true; this.updateAmPmStyle(); });
+        this.hourInput.addEventListener('change', () => { let v = parseInt(this.hourInput.value) || 12; this.hour = Math.max(1, Math.min(12, v)); this.hourInput.value = String(this.hour).padStart(2, '0'); });
+        this.minInput.addEventListener('change', () => { let v = parseInt(this.minInput.value) || 0; this.minute = Math.max(0, Math.min(59, v)); this.minInput.value = String(this.minute).padStart(2, '0'); });
+        document.getElementById('setTimeBtn').addEventListener('click', () => this.setTime());
+        document.getElementById('clearTime').addEventListener('click', () => this.clearTime());
+        document.addEventListener('click', (e) => { if (this.isOpen && !e.target.closest('.time-picker-wrapper')) this.close(); });
+      },
+      updateAmPmStyle() {
+        const active = { background: '#3b82f6', color: '#ffffff', borderColor: '#3b82f6' };
+        const inactive = { background: '#ffffff', color: '#334155', borderColor: '#e2e8f0' };
+        Object.assign(this.amBtn.style, this.isPM ? inactive : active);
+        Object.assign(this.pmBtn.style, this.isPM ? active : inactive);
+      },
+      toggle() { this.isOpen ? this.close() : this.open(); },
+      open() { if (datePicker.isOpen) datePicker.close(); customSelects.forEach(s => s.close()); this.isOpen = true; this.timeDisplay.classList.add('active'); this.timeDropdown.classList.add('show'); },
+      close() { this.isOpen = false; this.timeDisplay.classList.remove('active'); this.timeDropdown.classList.remove('show'); },
+      setTime() {
+        const period = this.isPM ? 'PM' : 'AM';
+        this.timeDisplayText.textContent = `${String(this.hour).padStart(2, '0')}:${String(this.minute).padStart(2, '0')} ${period}`;
+        this.timeDisplayText.classList.remove('placeholder');
+        let hour24 = this.hour; if (this.isPM && this.hour !== 12) hour24 += 12; if (!this.isPM && this.hour === 12) hour24 = 0;
+        this.hiddenInput.value = `${String(hour24).padStart(2, '0')}:${String(this.minute).padStart(2, '0')}`;
+        this.close();
+      },
+      clearTime() { this.hour = 12; this.minute = 0; this.isPM = true; this.hourInput.value = '12'; this.minInput.value = '00'; this.timeDisplayText.textContent = 'Select time...'; this.timeDisplayText.classList.add('placeholder'); this.hiddenInput.value = ''; this.updateAmPmStyle(); this.close(); }
+    };
+    timePicker.init();
+
+    // Close all dropdowns on outside click/escape
+    document.addEventListener('click', (e) => { if (!e.target.closest('.custom-select-wrapper')) customSelects.forEach(s => s.close()); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') customSelects.forEach(s => s.close()); });
+
+    // File handling
+    let selectedFile = null;
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+      const fileLabel = document.getElementById('fileLabel');
+      if (e.target.files.length > 0) { selectedFile = e.target.files[0]; fileLabel.textContent = selectedFile.name; fileLabel.style.color = '#3b82f6'; document.getElementById('cameraInput').value = ''; }
+      else { selectedFile = null; fileLabel.textContent = 'No file selected'; fileLabel.style.color = '#64748b'; }
+    });
+    document.getElementById('cameraInput').addEventListener('change', function(e) {
+      const fileLabel = document.getElementById('fileLabel');
+      if (e.target.files.length > 0) { selectedFile = e.target.files[0]; fileLabel.textContent = `Photo_${new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)}.jpg`; fileLabel.style.color = '#3b82f6'; document.getElementById('fileInput').value = ''; }
+      else { selectedFile = null; fileLabel.textContent = 'No file selected'; fileLabel.style.color = '#64748b'; }
+    });
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result.split(',')[1]); reader.onerror = reject; reader.readAsDataURL(file); });
+    }
+
+    async function sendToPowerAutomate(formData) {
+      const url = config.power_automate_url || defaultConfig.power_automate_url;
+      if (!url) { console.warn('Power Automate URL not configured.', formData); return { success: true, message: 'Data logged' }; }
+      try {
+        const response = await fetch(url, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(formData) });
+        if (response.ok) return { success: true, message: 'Sent successfully' };
+        throw new Error(`HTTP ${response.status}`);
+      } catch (error) { console.error('Error:', error); return { success: false, message: error.message }; }
+    }
+
+    // Form submission
+    document.getElementById('incidentForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const projectSelect = customSelects.find(s => s.selectId === 'project');
+      const categorySelect = customSelects.find(s => s.selectId === 'category');
+      const potentialSelect = customSelects.find(s => s.selectId === 'potential');
+      let attachment = { fileName: "", fileContent: "" };
+      if (selectedFile) { attachment = { fileName: document.getElementById('fileLabel').textContent, fileContent: await fileToBase64(selectedFile) }; }
+
+      const formData = {
+        "Submitted At": new Date().toISOString(),
+        "Date Observed": document.getElementById('observationDate').value || "",
+        "Time Observed": document.getElementById('observationTime').value || "",
+        "Project": projectSelect.getText() || "",
+        "Work Location": document.getElementById('workLocation').value || "",
+        "Task": document.getElementById('task').value || "",
+        "Incident Details": document.getElementById('incidentDetails').value || "",
+        "Location Details": document.getElementById('locationDetails').value || "",
+        "Action Taken": document.getElementById('actionTaken').value || "",
+        "Recommendations": document.getElementById('recommendations').value || "",
+        "Category": categorySelect.getText() || "",
+        "Potential Impact": potentialSelect.getText() || "",
+        "fileName": attachment.fileName || "no_file.jpg",
+        "fileContent": attachment.fileContent || ""
+      };
+
+      const saveBtn = document.querySelector('.save-btn');
+      const originalHTML = saveBtn.innerHTML;
+      saveBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="12"></circle></svg><span>Submitting...</span>';
+      saveBtn.disabled = true;
+
+      const result = await sendToPowerAutomate(formData);
+      if (result.success) {
+        saveBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Submitted Successfully</span>';
+        saveBtn.style.background = 'linear-gradient(135deg, #059669 0%, #10b981 100%)';
+        setTimeout(() => {
+          saveBtn.innerHTML = originalHTML;
+          saveBtn.style.background = `linear-gradient(135deg, ${config.button_gradient_start || defaultConfig.button_gradient_start} 0%, ${config.button_gradient_end || defaultConfig.button_gradient_end} 100%)`;
+          saveBtn.disabled = false;
+          document.getElementById('incidentForm').reset();
+          document.getElementById('fileLabel').textContent = 'No file selected';
+          document.getElementById('fileLabel').style.color = '#64748b';
+          document.getElementById('fileInput').value = ''; document.getElementById('cameraInput').value = '';
+          selectedFile = null; datePicker.clearDate(); timePicker.clearTime(); customSelects.forEach(s => s.clear());
+        }, 2000);
+      } else {
+        saveBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg><span>Failed</span>';
+        saveBtn.style.background = 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)';
+        setTimeout(() => { saveBtn.innerHTML = originalHTML; saveBtn.style.background = `linear-gradient(135deg, ${config.button_gradient_start || defaultConfig.button_gradient_start} 0%, ${config.button_gradient_end || defaultConfig.button_gradient_end} 100%)`; saveBtn.disabled = false; }, 3000);
+        alert('Failed: ' + result.message);
+      }
+    });
+
+    // Clear form
+    document.getElementById('clearFormBtn').addEventListener('click', function() {
+      document.getElementById('incidentForm').reset();
+      document.getElementById('fileLabel').textContent = 'No file selected';
+      document.getElementById('fileLabel').style.color = '#64748b';
+      document.getElementById('fileInput').value = ''; document.getElementById('cameraInput').value = '';
+      selectedFile = null; datePicker.clearDate(); timePicker.clearTime(); customSelects.forEach(s => s.clear());
+    });
+
+    document.querySelector('.close-btn').addEventListener('click', (e) => e.preventDefault());
+    onConfigChange(config);
+  </script>
+ </body>
+</html>
